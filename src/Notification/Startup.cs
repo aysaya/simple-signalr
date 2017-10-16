@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Notification.ResourceAccessors;
 using Notification.MessageHandlers;
+using Notification.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Notification
 {
@@ -38,10 +35,22 @@ namespace Notification
             var quoteStore = new MemoryPersistence();
             services.AddSingleton<IQueryRA>(quoteStore);
             services.AddSingleton<ICommandRA>(quoteStore);
+            services.AddSingleton<IProvideRateFeedClientContext, RateFeedClients>();
+            services.AddSingleton<INotifyRateFeedClient, RateFeedClientNotifier>();
 
             services.AddScoped<IHandleMessage, MessageHandler>();
             services.AddScoped<IProcessMessage, MessageProcessor>();
             services.AddScoped<IRegisterMessageHandler, RegisterMessageHandler>();
+
+            services.AddSignalR();
+            services.AddCors(p => p.AddPolicy("AllowAllOrigins",
+                builder =>
+                {
+                    builder.AllowAnyOrigin();
+                    builder.AllowAnyHeader();
+                    builder.AllowAnyMethod();
+                }
+            ));
 
             services.AddMvc();
         }
@@ -54,7 +63,12 @@ namespace Notification
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors("AllowAllOrigins");
+            app.UseSignalR(routes => routes.MapHub<RateFeedHub>("rate-feed-hub"));
+
             serviceProvider.GetService<IRegisterMessageHandler>().Register();
+
+            serviceProvider.GetService<IProvideRateFeedClientContext>().RateFeedClients = serviceProvider.GetService<IHubContext<RateFeedHub>>();
 
             app.UseMvc();
         }
