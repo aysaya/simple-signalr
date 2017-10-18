@@ -26,15 +26,15 @@ namespace QuoteEngine
             var queueName = Configuration["simple-queue-name"];
             var topicName = Configuration["simple-topic-name"];
 
-            services.AddServiceBus(connectionString, queueName, topicName, null);
-            
+            services.AddQueueHandler<ThirdPartyRate>(connectionString, queueName);
+            services.AddTopicSender<NewQuoteReceived>(connectionString, topicName);
+
             //TODO: implement durable persistence
             var quoteStore = new MemoryPersistence();
             services.AddSingleton<IQueryRA>(quoteStore);
             services.AddSingleton<ICommandRA>(quoteStore);
             
-            services.AddScoped<IProcessMessage, ThirdPartyRateProcessor>();
-            services.AddScoped<IRegisterMessageHandler<ThirdPartyRate>, RegisterThirdPartyRateHandler>();
+            services.AddScoped(typeof(IProcessMessage<ThirdPartyRate>), typeof(ThirdPartyRateProcessor<ThirdPartyRate>));
             services.AddMvc();
         }
 
@@ -46,7 +46,7 @@ namespace QuoteEngine
                 app.UseDeveloperExceptionPage();
             }
 
-            serviceProvider.GetService<IRegisterMessageHandler<ThirdPartyRate>>().Register();
+            app.RegisterHandler<ThirdPartyRate>(serviceProvider);
             app.UseMvc();
         }
     }

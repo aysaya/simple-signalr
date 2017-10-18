@@ -9,11 +9,11 @@ namespace RateWebhook.Controllers
     [Route("api/[controller]")]
     public class ThirdpartyRatesController : Controller
     {
-        private readonly ISendMessage sender;
+        private readonly ISendMessage<ThirdPartyRate> sender;
         private readonly IQueryRA query;
         private readonly ICommandRA command;
 
-        public ThirdpartyRatesController(ISendMessage sender, IQueryRA query, ICommandRA command)
+        public ThirdpartyRatesController(ISendMessage<ThirdPartyRate> sender, IQueryRA query, ICommandRA command)
         {
             this.sender = sender;
             this.command = command;

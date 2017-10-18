@@ -28,7 +28,7 @@ namespace Notification
             var subscriptionName = Configuration["simple-subscription-name"];
             var topicName = Configuration["simple-topic-name"];
 
-            services.AddServiceBus(connectionString, null, topicName, subscriptionName);
+            services.AddSubscriptionHandler<NewQuoteReceived>(connectionString,topicName,subscriptionName);
 
             //TODO: implement durable persistence
             var quoteStore = new MemoryPersistence();
@@ -36,10 +36,9 @@ namespace Notification
             services.AddSingleton<ICommandRA>(quoteStore);
             services.AddSingleton<IProvideRateFeedClientContext, RateFeedClients>();
             services.AddSingleton<INotifyRateFeedClient, RateFeedClientNotifier>();
-            services.AddScoped<IProcessMessage, NewQuoteReceivedProcessor>();
+            services.AddScoped<IProcessMessage<NewQuoteReceived>, NewQuoteReceivedProcessor<NewQuoteReceived>>();
 
-            services.AddScoped<IRegisterMessageHandler<NewQuoteReceived>, RegisterNewQuoteReceivedHandler>();
-
+            
             services.AddSignalR();
             services.AddCors(p => p.AddPolicy("AllowAllOrigins",
                 builder =>
@@ -64,7 +63,7 @@ namespace Notification
             app.UseCors("AllowAllOrigins");
             app.UseSignalR(routes => routes.MapHub<RateFeedHub>("rate-feed-hub"));
 
-            serviceProvider.GetService<IRegisterMessageHandler<NewQuoteReceived>>().Register();
+            app.RegisterSubscriptionHandler<NewQuoteReceived>(serviceProvider);
 
             serviceProvider.GetService<IProvideRateFeedClientContext>().RateFeedClients = serviceProvider.GetService<IHubContext<RateFeedHub>>();
 

@@ -7,26 +7,26 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.ServiceBus
 {
-    public interface IHandleMessage
+    public interface IHandleMessage<T>
     {
-        Task HandleAsync<T>(Message message, CancellationToken token);
+        Task HandleAsync(Message message, CancellationToken token);
         Task HandleOption(ExceptionReceivedEventArgs arg);
     }
 
-    public class MessageHandler : IHandleMessage
+    public class MessageHandler<T> : IHandleMessage<T>
     {
-        private IProcessMessage messageProcessor;
+        private IProcessMessage<T> messageProcessor;
 
-        public MessageHandler(IProcessMessage messageProcessor)
+        public MessageHandler(IProcessMessage<T> messageProcessor)
         {
             this.messageProcessor = messageProcessor;
         }
 
-        public async Task HandleAsync<T>(Message message, CancellationToken token)
+        public async Task HandleAsync(Message message, CancellationToken token)
         {
             var body = JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(message.Body));
             await messageProcessor.ProcessAsync(body);
-            System.Console.WriteLine("Message handled successfully!");
+            Console.WriteLine("Message handled successfully!");
         }
 
         public Task HandleOption(ExceptionReceivedEventArgs arg)
@@ -34,6 +34,5 @@ namespace Infrastructure.ServiceBus
             Console.WriteLine($"Message handler encountered an exception {arg.Exception}.");
             return Task.CompletedTask;
         }
-
     }
 }

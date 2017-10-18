@@ -2,8 +2,8 @@
 
 namespace Infrastructure.ServiceBus
 {
-    public interface IProcessMessage
+    public interface IProcessMessage<T>
     {
-        Task ProcessAsync<T>(T message);
+        Task ProcessAsync(T message);
     }
 }

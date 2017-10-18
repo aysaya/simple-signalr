@@ -1,4 +1,5 @@
-﻿using Infrastructure.ServiceBus;
+﻿using Contracts;
+using Infrastructure.ServiceBus;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -22,7 +23,7 @@ namespace RateWebhook
             var connectionString = Configuration["simple-bus-connection"];
             var queueName = Configuration["simple-queue-name"];
 
-            services.AddServiceBus(connectionString, queueName, null, null);
+            services.AddQueueSender<ThirdPartyRate>(connectionString, queueName);
             
             var thirdPartyRatesStore = new MemoryPersistence();
             services.AddSingleton<IQueryRA>(thirdPartyRatesStore);

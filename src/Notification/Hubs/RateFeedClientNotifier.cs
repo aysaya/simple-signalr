@@ -36,7 +36,7 @@ namespace Notification.Hubs
             return new RateFeedData
             {
                 BaseCurrency = keyValuePairs["BaseCurrency"],
-                TargetCurrency = keyValuePairs["TargetCurrency"],
+                TargetCurrency = keyValuePairs["TradeCurrency"],
                 RateValue = Convert.ToDouble(keyValuePairs["Rate"])
             };
         }
