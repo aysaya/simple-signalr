@@ -26,7 +26,7 @@ namespace QuoteEngine
             var queueName = Configuration["simple-queue-name"];
             var topicName = Configuration["simple-topic-name"];
 
-            services.AddQueueHandler<ThirdPartyRate>(connectionString, queueName);
+            services.AddQueueHandler<ThirdPartyRate, ThirdPartyRateProcessor> (connectionString, queueName);
             services.AddTopicSender<NewQuoteReceived>(connectionString, topicName);
 
             //TODO: implement durable persistence
@@ -34,7 +34,6 @@ namespace QuoteEngine
             services.AddSingleton<IQueryRA>(quoteStore);
             services.AddSingleton<ICommandRA>(quoteStore);
             
-            services.AddScoped(typeof(IProcessMessage<ThirdPartyRate>), typeof(ThirdPartyRateProcessor<ThirdPartyRate>));
             services.AddMvc();
         }
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuoteEngine.MessageHandlers
 {
-    public class ThirdPartyRateProcessor<T> : IProcessMessage<T>
+    public class ThirdPartyRateProcessor : IProcessMessage<ThirdPartyRate>
     {
         private readonly ICommandRA commandRA;
         private readonly ISendMessage<NewQuoteReceived> messagePublisher;
@@ -18,9 +18,9 @@ namespace QuoteEngine.MessageHandlers
             this.messagePublisher = messagePublisher;
         }
 
-        public async Task ProcessAsync(T message)
+        public async Task ProcessAsync(ThirdPartyRate message)
         {
-            var quote = AssembleQuote(message as ThirdPartyRate);
+            var quote = AssembleQuote(message);
 
             var saveTask = commandRA.SaveAsync(quote);
 

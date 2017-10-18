@@ -16,13 +16,14 @@ namespace Infrastructure.ServiceBus
             return services;
         }
 
-        public static IServiceCollection AddQueueHandler<T>(this IServiceCollection services,
+        public static IServiceCollection AddQueueHandler<T, TProcessor>(this IServiceCollection services,
             string connectionString, string queueName)
         {
             var conn = new ServiceBusConnectionProvider<T>(connectionString, queueName);
             services.AddScoped(typeof(IProvideServiceBusConnection<T>), (p => conn));
             services.AddScoped(typeof(IHandleMessage<T>), typeof(MessageHandler<T>));
             services.AddScoped(typeof(IRegisterHandler<T>), typeof(RegisterHandler<T>));
+            services.AddScoped(typeof(IProcessMessage<T>), typeof(TProcessor));
 
             return services;
         }
@@ -37,13 +38,14 @@ namespace Infrastructure.ServiceBus
             return services;
         }
 
-        public static IServiceCollection AddSubscriptionHandler<T>(this IServiceCollection services,
+        public static IServiceCollection AddSubscriptionHandler<T, TProcessor>(this IServiceCollection services,
             string connectionString, string topicName, string subscriptionName)
         {
             var conn = new ServiceBusConnectionProvider<T>(connectionString, topicName, subscriptionName);
             services.AddScoped(typeof(IProvideServiceBusConnection<T>), (p => conn));
             services.AddScoped(typeof(IHandleMessage<T>), typeof(MessageHandler<T>));
             services.AddScoped(typeof(IRegisterHandler<T>), typeof(RegisterSubscriptionHandler<T>));
+            services.AddScoped(typeof(IProcessMessage<T>), typeof(TProcessor));
 
             return services;
         }

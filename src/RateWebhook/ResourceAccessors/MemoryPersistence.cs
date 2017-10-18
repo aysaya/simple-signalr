@@ -18,10 +18,10 @@ namespace RateWebhook.ResourceAccessors
     {
         private static HashSet<ThirdPartyRate> cache = new HashSet<ThirdPartyRate>();
         
-        public async Task SaveAsync(ThirdPartyRate rate)
+        public Task SaveAsync(ThirdPartyRate rate)
         {
             cache.Add(rate);
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
 
         public async Task<ThirdPartyRate[]> GetAllAsync()

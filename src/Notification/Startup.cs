@@ -28,7 +28,10 @@ namespace Notification
             var subscriptionName = Configuration["simple-subscription-name"];
             var topicName = Configuration["simple-topic-name"];
 
-            services.AddSubscriptionHandler<NewQuoteReceived>(connectionString,topicName,subscriptionName);
+            services.AddSubscriptionHandler<NewQuoteReceived, NewQuoteReceivedProcessor>
+                (
+                    connectionString,topicName,subscriptionName
+                );
 
             //TODO: implement durable persistence
             var quoteStore = new MemoryPersistence();
@@ -36,7 +39,6 @@ namespace Notification
             services.AddSingleton<ICommandRA>(quoteStore);
             services.AddSingleton<IProvideRateFeedClientContext, RateFeedClients>();
             services.AddSingleton<INotifyRateFeedClient, RateFeedClientNotifier>();
-            services.AddScoped<IProcessMessage<NewQuoteReceived>, NewQuoteReceivedProcessor<NewQuoteReceived>>();
 
             
             services.AddSignalR();

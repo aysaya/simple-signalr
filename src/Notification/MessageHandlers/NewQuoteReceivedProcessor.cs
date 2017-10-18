@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Notification.MessageHandlers
 {
-    public class NewQuoteReceivedProcessor<T> : IProcessMessage<T>
+    public class NewQuoteReceivedProcessor : IProcessMessage<NewQuoteReceived>
     {
         private readonly ICommandRA commandRA;
         private readonly INotifyRateFeedClient notifyRateFeedClient;
@@ -18,9 +18,9 @@ namespace Notification.MessageHandlers
             this.notifyRateFeedClient = notifyRateFeedClient;
         }
 
-        public async Task ProcessAsync(T message)
+        public async Task ProcessAsync(NewQuoteReceived message)
         {
-            var payload = JsonConvert.SerializeObject(message as NewQuoteReceived);
+            var payload = JsonConvert.SerializeObject(message);
             var notifyRateFeedClients = notifyRateFeedClient.Notify(payload);
 
             await commandRA.SaveAsync(new Models.Notification
