@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Notification.ResourceAccessors;
-using Notification.MessageHandlers;
 using Notification.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using Infrastructure.ServiceBus;
+using Contracts;
+using Notification.MessageHandlers;
 
 namespace Notification
 {
@@ -26,10 +28,7 @@ namespace Notification
             var subscriptionName = Configuration["simple-subscription-name"];
             var topicName = Configuration["simple-topic-name"];
 
-            services.AddSingleton<IProvideServiceBusConnection>
-                (
-                    new ServiceBusConnectionProvider(connectionString, topicName, subscriptionName)
-                );
+            services.AddServiceBus(connectionString, null, topicName, subscriptionName);
 
             //TODO: implement durable persistence
             var quoteStore = new MemoryPersistence();
@@ -37,10 +36,9 @@ namespace Notification
             services.AddSingleton<ICommandRA>(quoteStore);
             services.AddSingleton<IProvideRateFeedClientContext, RateFeedClients>();
             services.AddSingleton<INotifyRateFeedClient, RateFeedClientNotifier>();
+            services.AddScoped<IProcessMessage, NewQuoteReceivedProcessor>();
 
-            services.AddScoped<IHandleMessage, MessageHandler>();
-            services.AddScoped<IProcessMessage, MessageProcessor>();
-            services.AddScoped<IRegisterMessageHandler, RegisterMessageHandler>();
+            services.AddScoped<IRegisterMessageHandler<NewQuoteReceived>, RegisterNewQuoteReceivedHandler>();
 
             services.AddSignalR();
             services.AddCors(p => p.AddPolicy("AllowAllOrigins",
@@ -66,7 +64,7 @@ namespace Notification
             app.UseCors("AllowAllOrigins");
             app.UseSignalR(routes => routes.MapHub<RateFeedHub>("rate-feed-hub"));
 
-            serviceProvider.GetService<IRegisterMessageHandler>().Register();
+            serviceProvider.GetService<IRegisterMessageHandler<NewQuoteReceived>>().Register();
 
             serviceProvider.GetService<IProvideRateFeedClientContext>().RateFeedClients = serviceProvider.GetService<IHubContext<RateFeedHub>>();
 

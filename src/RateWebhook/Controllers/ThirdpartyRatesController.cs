@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using RateWebhook.Models;
 using RateWebhook.ResourceAccessors;
+using Infrastructure.ServiceBus;
+using Contracts;
 
 namespace RateWebhook.Controllers
 {
@@ -23,7 +24,7 @@ namespace RateWebhook.Controllers
         public async Task Post([FromBody]ThirdPartyRate value)
         {
             var saveTask = command.SaveAsync(value);
-            await sender.Send(value);
+            await sender.SendAsync(value);
         }
 
         [HttpGet]

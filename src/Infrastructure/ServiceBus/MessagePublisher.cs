@@ -3,12 +3,13 @@ using Newtonsoft.Json;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuoteEngine.MessageHandlers
+namespace Infrastructure.ServiceBus
 {
     public interface IPublishMessage
     {
-        Task Publish(string message);
+        Task PublishAsync<T>(T message);
     }
+
     public class MessagePublisher : IPublishMessage
     {
         private readonly IProvideServiceBusConnection bus;
@@ -18,14 +19,12 @@ namespace QuoteEngine.MessageHandlers
             this.bus = bus;
         }
 
-        public async Task Publish(string message)
+        public async Task PublishAsync<T>(T message)
         {
-            var client = new TopicClient(bus.ConnectionString, bus.TopicName);
-
-            await client.SendAsync(
+            await bus.TopicClient.SendAsync(
                 new Message
                 (
-                    Encoding.UTF8.GetBytes(message)
+                    Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message))
                 ));
             System.Console.WriteLine("Message published successfully!");
         }

@@ -1,14 +1,15 @@
 ﻿using Microsoft.Azure.ServiceBus;
+using Newtonsoft.Json;
 using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using QuoteEngine.MessageHandlers;
 
-namespace BasicQueueSender.MessageHandlers
+namespace Infrastructure.ServiceBus
 {
     public interface IHandleMessage
     {
-        Task Handle(Message message, CancellationToken token);
+        Task HandleAsync<T>(Message message, CancellationToken token);
         Task HandleOption(ExceptionReceivedEventArgs arg);
     }
 
@@ -21,9 +22,10 @@ namespace BasicQueueSender.MessageHandlers
             this.messageProcessor = messageProcessor;
         }
 
-        public async Task Handle(Message message, CancellationToken token)
+        public async Task HandleAsync<T>(Message message, CancellationToken token)
         {
-            await messageProcessor.ProcessAsync(message);
+            var body = JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(message.Body));
+            await messageProcessor.ProcessAsync(body);
             System.Console.WriteLine("Message handled successfully!");
         }
 

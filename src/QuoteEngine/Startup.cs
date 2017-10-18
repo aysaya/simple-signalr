@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using QuoteEngine.ResourceAccessors;
-using BasicQueueSender.MessageHandlers;
 using QuoteEngine.MessageHandlers;
+using Infrastructure.ServiceBus;
+using Contracts;
 
 namespace QuoteEngine
 {
@@ -25,20 +26,15 @@ namespace QuoteEngine
             var queueName = Configuration["simple-queue-name"];
             var topicName = Configuration["simple-topic-name"];
 
-            services.AddSingleton<IProvideServiceBusConnection>
-                (
-                    new ServiceBusConnectionProvider(connectionString, queueName, topicName)
-                );
-
+            services.AddServiceBus(connectionString, queueName, topicName, null);
+            
             //TODO: implement durable persistence
             var quoteStore = new MemoryPersistence();
             services.AddSingleton<IQueryRA>(quoteStore);
             services.AddSingleton<ICommandRA>(quoteStore);
-
-            services.AddScoped<IHandleMessage, MessageHandler>();
-            services.AddScoped<IPublishMessage, MessagePublisher>();
-            services.AddScoped<IProcessMessage, MessageProcessor>();
-            services.AddScoped<IRegisterMessageHandler, RegisterMessageHandler>();
+            
+            services.AddScoped<IProcessMessage, ThirdPartyRateProcessor>();
+            services.AddScoped<IRegisterMessageHandler<ThirdPartyRate>, RegisterThirdPartyRateHandler>();
             services.AddMvc();
         }
 
@@ -50,7 +46,7 @@ namespace QuoteEngine
                 app.UseDeveloperExceptionPage();
             }
 
-            serviceProvider.GetService<IRegisterMessageHandler>().Register();
+            serviceProvider.GetService<IRegisterMessageHandler<ThirdPartyRate>>().Register();
             app.UseMvc();
         }
     }

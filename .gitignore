@@ -17,3 +17,9 @@
 
 /src/Payments.App/obj
 /src/Payments.App/bin
+
+/src/Contracts/obj
+/src/Contracts/bin
+
+/src/Infrastructure/obj
+/src/Infrastructure/bin

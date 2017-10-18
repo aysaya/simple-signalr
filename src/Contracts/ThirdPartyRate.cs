@@ -1,4 +1,4 @@
-﻿namespace RateWebhook.Models
+﻿namespace Contracts
 {
     public class ThirdPartyRate
     {
