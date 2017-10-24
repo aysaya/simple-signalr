@@ -6,7 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using QuoteEngine.ResourceAccessors;
 using QuoteEngine.MessageHandlers;
 using Infrastructure.ServiceBus;
-using Contracts;
+using Infrastructure.CosmosDb;
+using QuoteEngine.DomainModels;
 
 namespace QuoteEngine
 {
@@ -22,17 +23,22 @@ namespace QuoteEngine
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbCollection<Quote>
+                (
+                    Configuration["simple-cosmos-endpoint"],
+                    Configuration["simple-cosmos-connection"],
+                    Configuration["quote-engine-database-id"],
+                    Configuration["quotes-collection-id"]
+                );
+            services.AddScoped(typeof(IQueryRA<Quote>), typeof(QuotePersistence));
+            services.AddScoped(typeof(ICommandRA<Quote>), typeof(QuotePersistence));
+
             var connectionString = Configuration["simple-bus-connection"];
             var queueName = Configuration["simple-queue-name"];
             var topicName = Configuration["simple-topic-name"];
 
-            services.AddQueueHandler<ThirdPartyRate, ThirdPartyRateProcessor> (connectionString, queueName);
-            services.AddTopicSender<NewQuoteReceived>(connectionString, topicName);
-
-            //TODO: implement durable persistence
-            var quoteStore = new MemoryPersistence();
-            services.AddSingleton<IQueryRA>(quoteStore);
-            services.AddSingleton<ICommandRA>(quoteStore);
+            services.AddTopicSender<Contracts.NewQuoteReceived>(connectionString, topicName);
+            services.AddQueueHandler<Contracts.CreateQuote, ThirdPartyRateProcessor> (connectionString, queueName);           
             
             services.AddMvc();
         }
@@ -45,7 +51,7 @@ namespace QuoteEngine
                 app.UseDeveloperExceptionPage();
             }
 
-            app.RegisterHandler<ThirdPartyRate>(serviceProvider);
+            app.RegisterHandler<Contracts.CreateQuote>(serviceProvider);
             app.UseMvc();
         }
     }

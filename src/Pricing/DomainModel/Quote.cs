@@ -1,7 +1,13 @@
-﻿namespace Pricing.DomainModel
+﻿using Newtonsoft.Json;
+
+namespace Pricing.DomainModel
 {
     public class Quote
     {
-        public string Payload { get; set; }
+        [JsonProperty(PropertyName = "id")]
+        public string Id { get; set; }
+        public string BaseCurrency { get; set; }
+        public string TargetCurrency { get; set; }
+        public double Rate { get; set; }
     }
 }

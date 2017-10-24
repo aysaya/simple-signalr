@@ -25,11 +25,16 @@ namespace Infrastructure.ServiceBus
                 (
                     new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)))
                 );
-            System.Console.WriteLine("Message sent successfully!");
+            System.Console.WriteLine($"Message {((dynamic)message).Id} sent successfully!");
         }
     }
 
-    public class TopicSender<T> : ISendMessage<T>
+    public interface IPublishMessage<T>
+    {
+        Task SendAsync(T message);
+    }
+
+    public class TopicSender<T> : IPublishMessage<T>
     {
         private readonly IProvideServiceBusConnection<T> bus;
 
@@ -44,7 +49,7 @@ namespace Infrastructure.ServiceBus
                 (
                     new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)))
                 );
-            System.Console.WriteLine("Message published successfully!");
+            System.Console.WriteLine($"Message {((dynamic)message).Id} published successfully!");
         }
     }
 }

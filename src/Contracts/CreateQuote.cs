@@ -1,6 +1,6 @@
 ﻿namespace Contracts
 {
-    public class NewQuoteReceived
+    public class CreateQuote
     {
         public string Id { get; set; }
         public string BaseCurrency { get; set; }

@@ -1,6 +1,6 @@
-﻿namespace Contracts
+﻿namespace Notification.Models
 {
-    public class NewQuoteReceived
+    public class RateFeed
     {
         public string Id { get; set; }
         public string BaseCurrency { get; set; }

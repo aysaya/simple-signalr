@@ -1,20 +1,20 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using RateWebhook.ResourceAccessors;
 using Infrastructure.ServiceBus;
-using Contracts;
-using System;
+using RateWebhook.ResourceAccessors;
+using RateWebhook.DomainModels;
 
 namespace RateWebhook.Controllers
 {
     [Route("api/[controller]")]
     public class ThirdpartyRatesController : Controller
     {
-        private readonly ISendMessage<ThirdPartyRate> sender;
-        private readonly IQueryRA query;
-        private readonly ICommandRA command;
+        private readonly ISendMessage<Contracts.CreateQuote> sender;
+        private readonly IQueryRA<ThirdPartyRate> query;
+        private readonly ICommandRA<ThirdPartyRate> command;
 
-        public ThirdpartyRatesController(ISendMessage<ThirdPartyRate> sender, IQueryRA query, ICommandRA command)
+        public ThirdpartyRatesController(ISendMessage<Contracts.CreateQuote> sender, 
+            IQueryRA<ThirdPartyRate> query, ICommandRA<ThirdPartyRate> command)
         {
             this.sender = sender;
             this.command = command;
@@ -22,11 +22,28 @@ namespace RateWebhook.Controllers
         }
 
         [HttpPost]
-        public Task Post([FromBody]ThirdPartyRate value)
+        public async Task Post([FromBody]Contracts.ThirdPartyRate value)
         {
-            var saveTask = command.SaveAsync(value);
-            var senderTask = sender.SendAsync(value);
-            return Task.CompletedTask;
+            var thirdPartyRate = await command.SaveAsync
+                (
+                    new ThirdPartyRate
+                    {
+                        BaseCurrency = value.BaseCurrency,
+                        TradeCurrency = value.TradeCurrency,
+                        Rate = value.Rate,
+                        ReferenceId = value.PartnerId
+                    }
+                );
+
+            var taskSend = sender.SendAsync(new Contracts.CreateQuote
+            {
+                Id = thirdPartyRate.Id,
+                BaseCurrency = thirdPartyRate.BaseCurrency,
+                TradeCurrency = thirdPartyRate.TradeCurrency,
+                Rate = thirdPartyRate.Rate,
+            });
+
+            await Task.CompletedTask;
         }
 
         [HttpGet]

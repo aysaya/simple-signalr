@@ -1,13 +1,10 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Notification.Hubs
 {
     public interface INotifyRateFeedClient
     {
-        Task Notify(string payload);
+        Task Notify(RateFeedData rateFeedData);
     }
     public class RateFeedClientNotifier : INotifyRateFeedClient
     {
@@ -18,27 +15,13 @@ namespace Notification.Hubs
             this.rateFeedClientContext = rateFeedClientContext;
         }
 
-        public Task Notify(string payload)
+        public async Task Notify(RateFeedData rateFeedData)
         {
             var hub = new RateFeedHub
             {
                 Clients = rateFeedClientContext.RateFeedClients.Clients
             };
-            hub.Send(AssembleRateFeedData(payload));
-            return Task.CompletedTask;
-        }
-
-        private RateFeedData AssembleRateFeedData(string payload)
-        {
-            var keyValuePairs = JsonConvert
-                .DeserializeObject<Dictionary<string, string>>(payload);
-
-            return new RateFeedData
-            {
-                BaseCurrency = keyValuePairs["BaseCurrency"],
-                TargetCurrency = keyValuePairs["TradeCurrency"],
-                RateValue = Convert.ToDouble(keyValuePairs["Rate"])
-            };
+            await hub.Send(rateFeedData);
         }
     }
 }

@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.SignalR;
 using Infrastructure.ServiceBus;
 using Contracts;
 using Notification.MessageHandlers;
+using Notification.Models;
+using Infrastructure.CosmosDb;
 
 namespace Notification
 {
@@ -24,6 +26,19 @@ namespace Notification
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbCollection<RateFeed>
+                (
+                    Configuration["simple-cosmos-endpoint"],
+                    Configuration["simple-cosmos-connection"],
+                    Configuration["notification-database-id"],
+                    Configuration["ratefeeds-collection-id"]
+                );
+            services.AddScoped(typeof(IQueryRA<RateFeed>), typeof(RateFeedPersistence));
+            services.AddScoped(typeof(ICommandRA<RateFeed>), typeof(RateFeedPersistence));
+
+            services.AddScoped<IProvideRateFeedClientContext, RateFeedClients>();
+            services.AddScoped<INotifyRateFeedClient, RateFeedClientNotifier>();
+
             var connectionString = Configuration["simple-bus-connection"];
             var subscriptionName = Configuration["simple-subscription-name"];
             var topicName = Configuration["simple-topic-name"];
@@ -32,14 +47,6 @@ namespace Notification
                 (
                     connectionString,topicName,subscriptionName
                 );
-
-            //TODO: implement durable persistence
-            var quoteStore = new MemoryPersistence();
-            services.AddSingleton<IQueryRA>(quoteStore);
-            services.AddSingleton<ICommandRA>(quoteStore);
-            services.AddSingleton<IProvideRateFeedClientContext, RateFeedClients>();
-            services.AddSingleton<INotifyRateFeedClient, RateFeedClientNotifier>();
-
             
             services.AddSignalR();
             services.AddCors(p => p.AddPolicy("AllowAllOrigins",

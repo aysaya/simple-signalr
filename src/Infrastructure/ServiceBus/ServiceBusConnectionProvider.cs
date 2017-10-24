@@ -30,9 +30,11 @@ namespace Infrastructure.ServiceBus
                 subscription = new SubscriptionClient(connectionString, topicName, subscriptionName);
         }
 
-        public QueueClient QueueClient { get => queueClient; }
-        public TopicClient TopicClient { get => topicClient; }
-        public SubscriptionClient SubscriptionClient { get => subscription; }        
+        public QueueClient QueueClient =>queueClient;
+        
+        public SubscriptionClient SubscriptionClient => subscription;
+        
+        public TopicClient TopicClient => topicClient;        
     }
 
 }

@@ -4,13 +4,15 @@
 
 /.vs
 *.user
-*.sln
 
 /src/RateWebhook/obj
 /src/RateWebhook/bin
 
 /src/QuoteEngine/obj
 /src/QuoteEngine/bin
+
+/src/Pricing/obj
+/src/Pricing/bin
 
 /src/Notification/obj
 /src/Notification/bin

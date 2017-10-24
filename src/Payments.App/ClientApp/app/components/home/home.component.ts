@@ -9,10 +9,10 @@ import { HubConnection } from '@aspnet/signalr-client';
 })
 export class HomeComponent implements OnInit {
     private hubConnection: HubConnection;
-    private rateFeeds: RateFeedData[] = [];
-    private currencyPair: string;
-    private rate: number;
-    private initMessage: string;
+    public rateFeeds: RateFeedData[] = [];
+    public currencyPair: string;
+    public rate: number;
+    public initMessage: string;
 
     ngOnInit() {
         this.hubConnection = new HubConnection('http://localhost:56486/rate-feed-hub');

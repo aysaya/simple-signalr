@@ -1,47 +1,42 @@
-﻿using Contracts;
-using Infrastructure.ServiceBus;
+﻿using Infrastructure.ServiceBus;
 using QuoteEngine.DomainModels;
 using QuoteEngine.ResourceAccessors;
-using System;
 using System.Threading.Tasks;
 
 namespace QuoteEngine.MessageHandlers
 {
-    public class ThirdPartyRateProcessor : IProcessMessage<ThirdPartyRate>
+    public class ThirdPartyRateProcessor : IProcessMessage<Contracts.CreateQuote>
     {
-        private readonly ICommandRA commandRA;
-        private readonly ISendMessage<NewQuoteReceived> messagePublisher;
+        private readonly ICommandRA<Quote> commandRA;
+        private readonly IPublishMessage<Contracts.NewQuoteReceived> messagePublisher;
 
-        public ThirdPartyRateProcessor(ICommandRA commandRA, ISendMessage<NewQuoteReceived> messagePublisher)
+        public ThirdPartyRateProcessor(ICommandRA<Quote> commandRA, IPublishMessage<Contracts.NewQuoteReceived> messagePublisher)
         {
             this.commandRA = commandRA;
             this.messagePublisher = messagePublisher;
         }
 
-        public async Task ProcessAsync(ThirdPartyRate message)
+        public async Task ProcessAsync(Contracts.CreateQuote message)
         {
-            var quote = AssembleQuote(message);
+            var quote = await commandRA.SaveAsync(AssembleQuote(message));
 
-            var saveTask = commandRA.SaveAsync(quote);
-
-            await messagePublisher.SendAsync(PrepareEventMessage(quote));
+            var pubTask = messagePublisher.SendAsync(PrepareEventMessage(quote));            
         }
 
 
-        private Quote AssembleQuote(ThirdPartyRate payload)
+        private Quote AssembleQuote(Contracts.CreateQuote payload)
         {
             return new Quote
             {
-                Id = Guid.NewGuid(),
                 BaseCurrency = payload.BaseCurrency,
                 TargetCurrency = payload.TradeCurrency,
                 Rate = payload.Rate
             };
         }
 
-        private NewQuoteReceived PrepareEventMessage(Quote quote)
+        private Contracts.NewQuoteReceived PrepareEventMessage(Quote quote)
         {
-            return new NewQuoteReceived
+            return new Contracts.NewQuoteReceived
             {
                 Id = quote.Id,
                 BaseCurrency = quote.BaseCurrency,

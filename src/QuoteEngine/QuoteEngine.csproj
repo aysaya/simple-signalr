@@ -4,6 +4,10 @@
     <UserSecretsId>basic-message-consumer</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Properties\PublishProfiles\quote-engine-uat-ayasaya - Web Deploy.pubxml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
   <ItemGroup>

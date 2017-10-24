@@ -26,7 +26,7 @@ namespace Infrastructure.ServiceBus
         {
             var body = JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(message.Body));
             await messageProcessor.ProcessAsync(body);
-            Console.WriteLine("Message handled successfully!");
+            Console.WriteLine($"Message {((dynamic)body).Id} handled successfully!");
         }
 
         public Task HandleOption(ExceptionReceivedEventArgs arg)

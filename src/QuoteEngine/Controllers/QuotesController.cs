@@ -8,8 +8,8 @@ namespace QuoteEngine.Controllers
     [Route("api/[controller]")]
     public class QuotesController : Controller
     {
-        private readonly IQueryRA queryRa;
-        public QuotesController(IQueryRA queryRa)
+        private readonly IQueryRA<Quote> queryRa;
+        public QuotesController(IQueryRA<Quote> queryRa)
         {
             this.queryRa = queryRa;
         }

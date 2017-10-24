@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Contracts;
+using Infrastructure.CosmosDb;
+using Infrastructure.ServiceBus;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Pricing.DomainModel;
 using Pricing.MessageHandlers;
 using Pricing.ResourceAccessors;
 using System;
@@ -20,23 +24,23 @@ namespace Pricing
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = Configuration["simple-bus-connection"];
-            var subscriptionName = Configuration["simple-subscription-name"];
-            var topicName = Configuration["simple-topic-name"];
-
-            services.AddSingleton<IProvideServiceBusConnection>
+            services.AddDbCollection<Quote>
                 (
-                    new ServiceBusConnectionProvider(connectionString, topicName, subscriptionName)
+                    Configuration["simple-cosmos-endpoint"],
+                    Configuration["simple-cosmos-connection"],
+                    Configuration["pricing-database-id"],
+                    Configuration["quotes-collection-id"]
+                );
+            services.AddScoped(typeof(IQueryRA<Quote>), typeof(QuotePersistence));
+            services.AddScoped(typeof(ICommandRA<Quote>), typeof(QuotePersistence));
+           
+            services.AddSubscriptionHandler<NewQuoteReceived, NewQuoteReceivedProcessor>
+                (
+                    Configuration["simple-bus-connection"],
+                    Configuration["simple-topic-name"],
+                    Configuration["simple-subscription-name"]
                 );
 
-            //TODO: implement durable persistence
-            var quoteStore = new MemoryPersistence();
-            services.AddSingleton<IQueryRA>(quoteStore);
-            services.AddSingleton<ICommandRA>(quoteStore);
-
-            services.AddScoped<IHandleMessage, MessageHandler>();
-            services.AddScoped<IProcessMessage, MessageProcessor>();
-            services.AddScoped<IRegisterMessageHandler, RegisterMessageHandler>();
             services.AddMvc();
         }
 
@@ -48,7 +52,7 @@ namespace Pricing
                 app.UseDeveloperExceptionPage();
             }
 
-            serviceProvider.GetService<IRegisterMessageHandler>().Register();
+            app.RegisterSubscriptionHandler<NewQuoteReceived>(serviceProvider);
 
             app.UseMvc();
         }
