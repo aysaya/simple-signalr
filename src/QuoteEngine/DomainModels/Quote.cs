@@ -10,6 +10,6 @@ namespace QuoteEngine.DomainModels
         public string BaseCurrency { get; set; }
         public string TargetCurrency { get; set; }
         public double Rate { get; set; }
-        public DateTime DateCreated => DateTime.UtcNow;        
+        public DateTime DateCreated { get; set; }
     }
 }

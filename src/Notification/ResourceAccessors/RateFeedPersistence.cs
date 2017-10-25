@@ -1,5 +1,6 @@
 ﻿using Infrastructure.CosmosDb;
-using Notification.Models;
+using Notification.DomainModels;
+using System;
 using System.Threading.Tasks;
 
 namespace Notification.ResourceAccessors
@@ -24,6 +25,8 @@ namespace Notification.ResourceAccessors
 
         public async Task<RateFeed> SaveAsync(RateFeed rateFeed)
         {
+            rateFeed.DateCreated = DateTime.UtcNow;
+
             return await repository.SaveAsync(rateFeed);
         }
 

@@ -11,6 +11,6 @@ namespace RateWebhook.DomainModels
         public string TradeCurrency { get; set; }
         public double Rate { get; set; }
         public string ReferenceId { get; set; }
-        public DateTime DateCreated => DateTime.UtcNow;        
+        public DateTime DateCreated { get; set; }       
     }
 }

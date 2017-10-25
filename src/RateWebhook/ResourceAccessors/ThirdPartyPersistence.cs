@@ -1,5 +1,6 @@
 ﻿using Infrastructure.CosmosDb;
 using RateWebhook.DomainModels;
+using System;
 using System.Threading.Tasks;
 
 namespace RateWebhook.ResourceAccessors
@@ -25,6 +26,8 @@ namespace RateWebhook.ResourceAccessors
 
         public async Task<ThirdPartyRate> SaveAsync(ThirdPartyRate rate)
         {
+            rate.DateCreated = DateTime.UtcNow;
+
             return await thirdPartyRepository.SaveAsync(rate);            
         }
 

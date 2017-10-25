@@ -1,7 +1,7 @@
 ﻿using Contracts;
 using Infrastructure.ServiceBus;
 using Notification.Hubs;
-using Notification.Models;
+using Notification.DomainModels;
 using Notification.ResourceAccessors;
 using System.Threading.Tasks;
 

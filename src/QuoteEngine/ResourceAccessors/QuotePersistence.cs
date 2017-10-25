@@ -1,5 +1,6 @@
 ﻿using Infrastructure.CosmosDb;
 using QuoteEngine.DomainModels;
+using System;
 using System.Threading.Tasks;
 
 namespace QuoteEngine.ResourceAccessors
@@ -24,6 +25,8 @@ namespace QuoteEngine.ResourceAccessors
 
         public async Task<Quote> SaveAsync(Quote quote)
         {
+            quote.DateCreated = DateTime.UtcNow;
+
             return await quoteRepository.SaveAsync(quote);
         }
 

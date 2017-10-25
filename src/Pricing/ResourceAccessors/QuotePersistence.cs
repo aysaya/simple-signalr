@@ -1,5 +1,6 @@
 ﻿using Infrastructure.CosmosDb;
 using Pricing.DomainModel;
+using System;
 using System.Threading.Tasks;
 
 namespace Pricing.ResourceAccessors
@@ -24,6 +25,8 @@ namespace Pricing.ResourceAccessors
 
         public async Task<Quote> SaveAsync(Quote quote)
         {
+            quote.DateCreated = DateTime.UtcNow;
+
             return await repository.SaveAsync(quote);
         }
 

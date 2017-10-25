@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 
 namespace Pricing.DomainModel
 {
@@ -9,5 +10,6 @@ namespace Pricing.DomainModel
         public string BaseCurrency { get; set; }
         public string TargetCurrency { get; set; }
         public double Rate { get; set; }
+        public DateTime DateCreated { get; set; }
     }
 }

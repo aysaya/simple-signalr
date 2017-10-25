@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.SignalR;
 using Infrastructure.ServiceBus;
 using Contracts;
 using Notification.MessageHandlers;
-using Notification.Models;
+using Notification.DomainModels;
 using Infrastructure.CosmosDb;
 
 namespace Notification
