@@ -4,13 +4,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Notification.ResourceAccessors;
-using Notification.Hubs;
-using Microsoft.AspNetCore.SignalR;
 using Infrastructure.ServiceBus;
 using Contracts;
 using Notification.MessageHandlers;
 using Notification.DomainModels;
 using Infrastructure.CosmosDb;
+using Infrastructure.Hubs;
 
 namespace Notification
 {
@@ -33,22 +32,19 @@ namespace Notification
                     Configuration["notification-database-id"],
                     Configuration["ratefeeds-collection-id"]
                 );
+
             services.AddScoped(typeof(IQueryRA<RateFeed>), typeof(RateFeedPersistence));
             services.AddScoped(typeof(ICommandRA<RateFeed>), typeof(RateFeedPersistence));
 
-            services.AddScoped<IProvideRateFeedClientContext, RateFeedClients>();
-            services.AddScoped<INotifyRateFeedClient, RateFeedClientNotifier>();
-
-            var connectionString = Configuration["simple-bus-connection"];
-            var subscriptionName = Configuration["simple-subscription-name"];
-            var topicName = Configuration["simple-topic-name"];
-
             services.AddSubscriptionHandler<NewQuoteReceived, NewQuoteReceivedProcessor>
                 (
-                    connectionString,topicName,subscriptionName
+                    Configuration["simple-bus-connection"],
+                    Configuration["simple-topic-name"],
+                    Configuration["simple-subscription-name"]
                 );
-            
-            services.AddSignalR();
+
+            services.AddHubSignalR<RateFeed>();
+
             services.AddCors(p => p.AddPolicy("AllowAllOrigins",
                 builder =>
                 {
@@ -70,12 +66,11 @@ namespace Notification
             }
 
             app.UseCors("AllowAllOrigins");
-            app.UseSignalR(routes => routes.MapHub<RateFeedHub>("rate-feed-hub"));
 
             app.RegisterSubscriptionHandler<NewQuoteReceived>(serviceProvider);
 
-            serviceProvider.GetService<IProvideRateFeedClientContext>().RateFeedClients = serviceProvider.GetService<IHubContext<RateFeedHub>>();
-
+            app.UseHubSignalR<RateFeed>("rate-feed-hub", serviceProvider);
+            
             app.UseMvc();
         }
     }

@@ -1,8 +1,8 @@
 <h1>Rate Feed</h1>
 
-<p *ngIf="rateFeeds.length > 0">Latest feed: <strong>{{ currencyPair }} : {{rate}}</strong></p>
+<p *ngIf="status">Latest feed: <strong>{{ currencyPair }} : {{rate}}</strong></p>
 
-<p *ngIf="rateFeeds.length === 0"><em>{{initMessage}}</em></p>
+<p *ngIf="!status"><em>Status: {{initMessage}}</em></p>
 
 <table class='table' *ngIf="rateFeeds.length > 0">
     <thead>

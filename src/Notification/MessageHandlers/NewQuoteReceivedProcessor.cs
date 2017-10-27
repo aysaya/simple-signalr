@@ -1,18 +1,18 @@
 ﻿using Contracts;
 using Infrastructure.ServiceBus;
-using Notification.Hubs;
 using Notification.DomainModels;
 using Notification.ResourceAccessors;
 using System.Threading.Tasks;
+using Infrastructure.Hubs;
 
 namespace Notification.MessageHandlers
 {
     public class NewQuoteReceivedProcessor : IProcessMessage<NewQuoteReceived>
     {
         private readonly ICommandRA<RateFeed> commandRA;
-        private readonly INotifyRateFeedClient notifyRateFeedClient;
+        private readonly IHubNotifier<RateFeed> notifyRateFeedClient;
 
-        public NewQuoteReceivedProcessor(ICommandRA<RateFeed> commandRA, INotifyRateFeedClient notifyRateFeedClient)
+        public NewQuoteReceivedProcessor(ICommandRA<RateFeed> commandRA, IHubNotifier<RateFeed> notifyRateFeedClient)
         {
             this.commandRA = commandRA;
             this.notifyRateFeedClient = notifyRateFeedClient;
@@ -20,24 +20,14 @@ namespace Notification.MessageHandlers
 
         public async Task ProcessAsync(NewQuoteReceived message)
         {
-            var saveTask = commandRA.SaveAsync(new RateFeed
+            var rateFeed = await commandRA.SaveAsync(new RateFeed
                 {
                     BaseCurrency = message.BaseCurrency,
                     TradeCurrency = message.TradeCurrency,
                     Rate = message.Rate
                 });
 
-            var notifyTask = notifyRateFeedClient.Notify
-                (
-                    new RateFeedData
-                    {
-                        BaseCurrency = message.BaseCurrency,
-                        TargetCurrency = message.TradeCurrency,
-                        RateValue = message.Rate
-                    }
-                );
-
-            await Task.WhenAll(saveTask, notifyTask);
+            await notifyRateFeedClient.NotifyAsync(rateFeed);
         }
     }
 }
