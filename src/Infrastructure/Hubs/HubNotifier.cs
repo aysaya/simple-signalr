@@ -10,17 +10,20 @@ namespace Infrastructure.Hubs
     public class HubNotifier<T> : IHubNotifier<T>
     {
         private readonly IProvideHubContext<T> hubContext;
-        private readonly IHubSender<T> hub;
 
-        public HubNotifier(IProvideHubContext<T> hubContext, IHubSender<T> hub)
+        public HubNotifier(IProvideHubContext<T> hubContext)
         {
             this.hubContext = hubContext;
-            this.hub = hub;
         }
 
         public async Task NotifyAsync(T t)
         {
-            await hub.SendAsync(t);
+            var sender = new HubSender<T>
+            {
+                Clients = hubContext.HubContext.Clients
+            };
+            
+            await sender.SendAsync(t);
         }        
     }
 }

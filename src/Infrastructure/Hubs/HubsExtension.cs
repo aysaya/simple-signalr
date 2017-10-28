@@ -11,8 +11,7 @@ namespace Infrastructure.Hubs
         {
             services.AddScoped<IProvideHubContext<T>, HubContextProvider<T>>();
             services.AddScoped<IHubNotifier<T>, HubNotifier<T>>();
-            services.AddScoped<IHubSender<T>, HubSender<T>>();
-
+            
             services.AddSignalR();
 
             return services;
