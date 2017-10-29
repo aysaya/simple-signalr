@@ -27,7 +27,7 @@ namespace Notification.MessageHandlers
                     Rate = message.Rate
                 });
 
-            await notifyRateFeedClient.NotifyAsync(rateFeed);
+            await notifyRateFeedClient.SendAsync(rateFeed);
         }
     }
 }

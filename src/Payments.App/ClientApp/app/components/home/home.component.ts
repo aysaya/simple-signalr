@@ -57,7 +57,7 @@ export class HomeComponent implements OnInit {
             if (this.rateFeeds.length > 4)
                 this.rateFeeds.shift();
 
-            this.rateFeeds.push(rateFeed);
+            this.rateFeeds.push(this.assembleRateFeed(rateFeed));
         }    
     }
     
@@ -73,17 +73,20 @@ export class HomeComponent implements OnInit {
                 }
             });
     }
-    
+
+    assembleRateFeed(rateFeed: any) {
+        return ({
+            baseCurrency: rateFeed.baseCurrency,
+            targetCurrency: rateFeed.tradeCurrency,
+            rateValue: rateFeed.rate,
+            reference: rateFeed.id
+        });
+    }
+
     assembleRateFeeds(rateFeeds: any) {
         for (let rateFeed of rateFeeds)
         {
-            this.rateFeeds.push(
-                {
-                    baseCurrency: rateFeed.baseCurrency,
-                    targetCurrency: rateFeed.tradeCurrency,
-                    rateValue: rateFeed.rate,
-                    reference: rateFeed.id
-                });
+            this.rateFeeds.push(this.assembleRateFeed(rateFeed));
         }
     }
 }

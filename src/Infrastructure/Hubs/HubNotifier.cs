@@ -1,29 +1,25 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.SignalR;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Hubs
 {
     public interface IHubNotifier<T>
     {
-        Task NotifyAsync(T t);
+        Task SendAsync(T t);
     }
 
-    public class HubNotifier<T> : IHubNotifier<T>
+    public class HubNotifier<T> : Hub, IHubNotifier<T>
     {
-        private readonly IProvideHubContext<T> hubContext;
+        private readonly IHubSender<T> hubSender;
 
-        public HubNotifier(IProvideHubContext<T> hubContext)
+        public HubNotifier(IHubSender<T> hubSender)
         {
-            this.hubContext = hubContext;
+            this.hubSender = hubSender;
         }
 
-        public async Task NotifyAsync(T t)
+        public async Task SendAsync(T t)
         {
-            var sender = new HubSender<T>
-            {
-                Clients = hubContext.HubContext.Clients
-            };
-            
-            await sender.SendAsync(t);
+            await hubSender.SendAsync(t);
         }        
     }
 }

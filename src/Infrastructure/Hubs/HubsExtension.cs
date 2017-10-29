@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -9,7 +8,7 @@ namespace Infrastructure.Hubs
     {
         public static IServiceCollection AddHubSignalR<T>(this IServiceCollection services)
         {
-            services.AddScoped<IProvideHubContext<T>, HubContextProvider<T>>();
+            services.AddScoped<IHubSender<T>, HubSender<T, HubNotifier<T>>>();
             services.AddScoped<IHubNotifier<T>, HubNotifier<T>>();
             
             services.AddSignalR();
@@ -17,11 +16,9 @@ namespace Infrastructure.Hubs
             return services;
         }
 
-        public static IApplicationBuilder UseHubSignalR<T>(this IApplicationBuilder app, string hubName, IServiceProvider serviceProvider)
+        public static IApplicationBuilder UseHubSignalR<T>(this IApplicationBuilder app, string hubName)
         {
-            app.UseSignalR(routes => routes.MapHub<HubSender<T>>(hubName));
-
-            serviceProvider.GetService<IProvideHubContext<T>>().HubContext = serviceProvider.GetService<IHubContext<HubSender<T>>>();
+            app.UseSignalR(routes => routes.MapHub<HubNotifier<T>>(hubName));
 
             return app;
         }

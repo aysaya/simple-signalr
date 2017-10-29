@@ -69,7 +69,7 @@ namespace Notification
 
             app.RegisterSubscriptionHandler<NewQuoteReceived>(serviceProvider);
 
-            app.UseHubSignalR<RateFeed>("rate-feed-hub", serviceProvider);
+            app.UseHubSignalR<RateFeed>("rate-feed-hub");
             
             app.UseMvc();
         }
