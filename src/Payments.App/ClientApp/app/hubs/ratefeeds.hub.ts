@@ -1,46 +1,41 @@
 ﻿import { HubConnection } from '@aspnet/signalr-client';
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Subject } from 'rxjs/Subject';
 
 @Injectable()
-export class RateFeedHub implements OnInit{
-    private status: boolean;
-    private rateFeedData: any;
+export class RateFeedHub {
+    private status = new Subject<boolean>();
     private hubConnection: HubConnection;
     private url = 'http://localhost:56486/rate-feed-hub';
+    private rateFeedSubject = new Subject<any>();
 
     constructor() {
         this.hubConnection = new HubConnection(this.url);
 
-        this.hubConnection.on('Send', (data: any) => this.rateFeedData = data);
+        this.hubConnection.on('Send', (data: any) => this.sendRateFeed(data));
 
         this.hubConnection.start()
             .then(() => {
-                this.status = true;
+                this.status.next(true);
                 console.log('Connected!');
             })
             .catch(err => {
-                this.status = false;
+                this.status.next(false);
                 console.log('Error connecting!');
             });
     }
 
-    ngOnInit() {
-        this.hubConnection = new HubConnection(this.url);
-
-        this.hubConnection.on('Send', (data: any) => this.rateFeedData = data);
-
-        this.hubConnection.start()
-            .then(() => {
-                this.status = true;
-                console.log('Connected!!');
-            })
-            .catch(err => {
-                this.status = false;
-                console.log('Error connecting!!');
-            });
+    sendRateFeed(rateFeedData: any) {
+        this.rateFeedSubject.next(rateFeedData);
     }
 
-    get Status(): boolean {return this.status;}
+    getRateFeed(): Observable<any> {
+        return this.rateFeedSubject.asObservable();
+    }
 
-    get RateFeedData(): any { return this.rateFeedData; }
+    getStatus(): Observable<boolean> {
+        return this.status.asObservable();
+    }
+
 }

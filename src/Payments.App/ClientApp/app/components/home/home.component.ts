@@ -1,7 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Http } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { HubConnection } from '@aspnet/signalr-client';
+import { Component } from '@angular/core';
+import { Subscription } from 'rxjs/Subscription';
 import { RateFeedsService } from './../../services/ratefeeds.service'
 import { RateFeedHub } from './../../hubs/ratefeeds.hub'
 
@@ -10,44 +8,27 @@ import { RateFeedHub } from './../../hubs/ratefeeds.hub'
     selector: 'home',
     templateUrl: './home.component.html'
 })
-export class HomeComponent implements OnInit {
-    private hubConnection: HubConnection;
+export class HomeComponent {
     public rateFeeds: RateFeedData[] = [];
     public currencyPair: string;
     public rate: number;
     public initMessage: string;
     public status: boolean;
+    public statusSubscription: Subscription;
+    public rateFeedSubscription: Subscription;
 
     constructor(private rateFeedsServce: RateFeedsService,
                 private rateFeedHub: RateFeedHub) {     
-    }
-
-    ngOnInit() {
         this.getRateFeeds();
-        this.initHub();
+        this.initRateFeedHub();
     }
 
     initRateFeedHub() {
-        this.getRateFeed(this.rateFeedHub.RateFeedData);
-        this.status = this.rateFeedHub.Status;
-        if (!status) {
-            this.initMessage = "Error establishing connection to hub."
-        }
-    }
+        this.rateFeedSubscription = this.rateFeedHub.getRateFeed()
+            .subscribe(data => this.getRateFeed(data));
+        this.statusSubscription = this.rateFeedHub.getStatus()
+            .subscribe(s => this.status = s);
 
-    initHub() {
-        this.hubConnection = new HubConnection('http://localhost:56486/rate-feed-hub');
-
-        this.hubConnection.on('Send', (data: any) => this.getRateFeed(data));
-
-        this.hubConnection.start()
-            .then(() => {
-                this.status  = true;
-            })
-            .catch(err => {
-                this.status = false;
-                this.initMessage = "Error establishing connection to hub."
-            });              
     }
 
     getRateFeed(rateFeed: any) {
