@@ -1,4 +1,4 @@
-﻿using Infrastructure.CosmosDb;
+﻿using Infrastructure.Common;
 using Pricing.DomainModel;
 using System;
 using System.Threading.Tasks;
@@ -16,9 +16,9 @@ namespace Pricing.ResourceAccessors
 
     public class QuotePersistence : ICommandRA<Quote>, IQueryRA<Quote>
     {
-        private readonly IProvideDocumentRepository<Quote> repository;
+        private readonly IProvideRepository<Quote> repository;
 
-        public QuotePersistence(IProvideDocumentRepository<Quote> repository)
+        public QuotePersistence(IProvideRepository<Quote> repository)
         {
             this.repository = repository;
         }

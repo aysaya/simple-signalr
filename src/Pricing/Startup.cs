@@ -1,5 +1,5 @@
 ﻿using Contracts;
-using Infrastructure.CosmosDb;
+using Infrastructure.Common;
 using Infrastructure.ServiceBus;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -24,13 +24,8 @@ namespace Pricing
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbCollection<Quote>
-                (
-                    Configuration["simple-cosmos-endpoint"],
-                    Configuration["simple-cosmos-connection"],
-                    Configuration["pricing-database-id"],
-                    Configuration["quotes-collection-id"]
-                );
+            services.AddStorageDb(o => o.UseSqliteStorage<Quote>("Data Source=Pricing"));
+
             services.AddScoped(typeof(IQueryRA<Quote>), typeof(QuotePersistence));
             services.AddScoped(typeof(ICommandRA<Quote>), typeof(QuotePersistence));
            

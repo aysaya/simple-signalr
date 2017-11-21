@@ -1,11 +1,11 @@
-﻿using Infrastructure.CosmosDb;
-using Infrastructure.ServiceBus;
+﻿using Infrastructure.ServiceBus;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RateWebhook.DomainModels;
 using RateWebhook.ResourceAccessors;
+using Infrastructure.Common;
 
 namespace RateWebhook
 {
@@ -21,16 +21,19 @@ namespace RateWebhook
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbCollection<ThirdPartyRate>
-                (
-                    Configuration["simple-cosmos-endpoint"],
-                    Configuration["simple-cosmos-connection"],
-                    Configuration["rate-webhook-database-id"],
-                    Configuration["thirdpartyrates-collection-id"]
-                );
+            ////to use cosmos db
+            //services.AddStorageDb(o=>o.UseCosmosDbStorage<ThirdPartyRate>
+            //    (Configuration["simple-cosmos-endpoint"],
+            //     Configuration["simple-cosmos-connection"],
+            //     Configuration["rate-webhook-database-id"],
+            //     Configuration["thirdpartyrates-collection-id"]
+            //    ));
+
+            services.AddStorageDb(o => o.UseSqliteStorage<ThirdPartyRate>("Data Source=Webhook"));
+
             services.AddScoped(typeof(IQueryRA<ThirdPartyRate>), typeof(ThirdPartyPersistence));
             services.AddScoped(typeof(ICommandRA<ThirdPartyRate>), typeof(ThirdPartyPersistence));
-
+            
             services.AddQueueSender<Contracts.CreateQuote>
                 (
                     Configuration["simple-bus-connection"], 

@@ -1,17 +1,11 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Azure.Documents.Linq;
 using System.Threading.Tasks;
+using Infrastructure.Common;
 
 namespace Infrastructure.CosmosDb
 {
-    public interface IProvideDocumentRepository<T>
-    {
-        Task<T> SaveAsync(T t);
-
-        Task<T[]> GetAllAsync();
-    }
-
-    public class DocumentDbRepository<T> : IProvideDocumentRepository<T>
+    public class DocumentDbRepository<T> : IProvideRepository<T>
     {
         private readonly IProvideCosmosDbConnection<T> cosmosDbConnection;
         public DocumentDbRepository(IProvideCosmosDbConnection<T> cosmosDbConnection)

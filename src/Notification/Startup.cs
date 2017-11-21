@@ -8,7 +8,7 @@ using Infrastructure.ServiceBus;
 using Contracts;
 using Notification.MessageHandlers;
 using Notification.DomainModels;
-using Infrastructure.CosmosDb;
+using Infrastructure.Common;
 using Infrastructure.Hubs;
 
 namespace Notification
@@ -25,13 +25,7 @@ namespace Notification
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbCollection<RateFeed>
-                (
-                    Configuration["simple-cosmos-endpoint"],
-                    Configuration["simple-cosmos-connection"],
-                    Configuration["notification-database-id"],
-                    Configuration["ratefeeds-collection-id"]
-                );
+            services.AddStorageDb(o=>o.UseSqliteStorage<RateFeed>("Data Source=Notification"));
 
             services.AddScoped(typeof(IQueryRA<RateFeed>), typeof(RateFeedPersistence));
             services.AddScoped(typeof(ICommandRA<RateFeed>), typeof(RateFeedPersistence));

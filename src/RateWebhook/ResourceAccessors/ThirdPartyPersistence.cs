@@ -1,4 +1,4 @@
-﻿using Infrastructure.CosmosDb;
+﻿using Infrastructure.Common;
 using RateWebhook.DomainModels;
 using System;
 using System.Threading.Tasks;
@@ -17,9 +17,9 @@ namespace RateWebhook.ResourceAccessors
 
     public class ThirdPartyPersistence : ICommandRA<ThirdPartyRate>, IQueryRA<ThirdPartyRate>
     {
-        private readonly IProvideDocumentRepository<ThirdPartyRate> thirdPartyRepository;
+        private readonly IProvideRepository<ThirdPartyRate> thirdPartyRepository;
 
-        public ThirdPartyPersistence(IProvideDocumentRepository<ThirdPartyRate> thirdPartyRepository)
+        public ThirdPartyPersistence(IProvideRepository<ThirdPartyRate> thirdPartyRepository)
         {
             this.thirdPartyRepository = thirdPartyRepository;
         }
@@ -28,7 +28,7 @@ namespace RateWebhook.ResourceAccessors
         {
             rate.DateCreated = DateTime.UtcNow;
 
-            return await thirdPartyRepository.SaveAsync(rate);            
+            return await thirdPartyRepository.SaveAsync(rate);
         }
 
         public async Task<ThirdPartyRate[]> GetAllAsync()

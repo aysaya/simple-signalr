@@ -20,7 +20,7 @@ namespace QuoteEngine.MessageHandlers
         {
             var quote = await commandRA.SaveAsync(AssembleQuote(message));
 
-            var pubTask = messagePublisher.SendAsync(PrepareEventMessage(quote));            
+            await messagePublisher.SendAsync(PrepareEventMessage(quote));            
         }
 
 

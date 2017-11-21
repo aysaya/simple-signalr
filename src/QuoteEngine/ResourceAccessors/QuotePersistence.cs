@@ -1,4 +1,4 @@
-﻿using Infrastructure.CosmosDb;
+﻿using Infrastructure.Common;
 using QuoteEngine.DomainModels;
 using System;
 using System.Threading.Tasks;
@@ -16,9 +16,9 @@ namespace QuoteEngine.ResourceAccessors
 
     public class QuotePersistence : ICommandRA<Quote>, IQueryRA<Quote>
     {
-        private readonly IProvideDocumentRepository<Quote> quoteRepository;
+        private readonly IProvideRepository<Quote> quoteRepository;
 
-        public QuotePersistence(IProvideDocumentRepository<Quote> quoteRepository)
+        public QuotePersistence(IProvideRepository<Quote> quoteRepository)
         {
             this.quoteRepository = quoteRepository;
         }

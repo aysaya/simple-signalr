@@ -1,4 +1,4 @@
-﻿using Infrastructure.CosmosDb;
+﻿using Infrastructure.Common;
 using Notification.DomainModels;
 using System;
 using System.Threading.Tasks;
@@ -16,9 +16,9 @@ namespace Notification.ResourceAccessors
 
     public class RateFeedPersistence : ICommandRA<RateFeed>, IQueryRA<RateFeed>
     {
-        private readonly IProvideDocumentRepository<RateFeed> repository;
+        private readonly IProvideRepository<RateFeed> repository;
 
-        public RateFeedPersistence(IProvideDocumentRepository<RateFeed> repository)
+        public RateFeedPersistence(IProvideRepository<RateFeed> repository)
         {
             this.repository = repository;
         }

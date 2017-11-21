@@ -35,15 +35,13 @@ namespace RateWebhook.Controllers
                     }
                 );
 
-            var taskSend = sender.SendAsync(new Contracts.CreateQuote
+            await sender.SendAsync(new Contracts.CreateQuote
             {
                 Id = thirdPartyRate.Id,
                 BaseCurrency = thirdPartyRate.BaseCurrency,
                 TradeCurrency = thirdPartyRate.TradeCurrency,
                 Rate = thirdPartyRate.Rate,
-            });
-
-            await Task.CompletedTask;
+            });            
         }
 
         [HttpGet]
