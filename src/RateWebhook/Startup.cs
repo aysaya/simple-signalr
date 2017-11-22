@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using RateWebhook.DomainModels;
 using RateWebhook.ResourceAccessors;
 using Infrastructure.Common;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Infrastructure.Authentication;
 
 namespace RateWebhook
 {
@@ -40,6 +42,12 @@ namespace RateWebhook
                     Configuration["simple-queue-name"]
                 );
 
+            services.AddAuthentication(sharedOptions =>
+            {
+                sharedOptions.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddAzureAdB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
+
             services.AddMvc();
         }
 
@@ -51,6 +59,7 @@ namespace RateWebhook
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseAuthentication();
             app.UseMvc();
         }
     }

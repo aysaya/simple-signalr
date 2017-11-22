@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Infrastructure.ServiceBus;
 using RateWebhook.ResourceAccessors;
 using RateWebhook.DomainModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RateWebhook.Controllers
 {
@@ -44,6 +45,7 @@ namespace RateWebhook.Controllers
             });            
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ThirdPartyRate[]> Get()
         {
