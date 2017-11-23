@@ -8,6 +8,7 @@ using RateWebhook.ResourceAccessors;
 using Infrastructure.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Infrastructure.Authentication;
+using Infrastructure.Authorization;
 
 namespace RateWebhook
 {
@@ -47,6 +48,9 @@ namespace RateWebhook
                 sharedOptions.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddAzureAdB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
+
+            services.AddAuth();
+
 
             services.AddMvc();
         }

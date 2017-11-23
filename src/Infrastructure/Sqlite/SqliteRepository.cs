@@ -12,6 +12,15 @@ namespace Infrastructure.Sqlite
         {
             this.context = context;
         }
+
+        public async Task DeleteAllAsync()
+        {
+            context.TEntity.RemoveRange(context.TEntity);
+            ((DbContext)context).SaveChanges();
+
+            await Task.CompletedTask;
+        }
+
         public async Task<T[]> GetAllAsync()
         {
             var result = await context.TEntity.ToArrayAsync();

@@ -8,6 +8,7 @@ namespace RateWebhook.ResourceAccessors
     public interface ICommandRA<T>
     {
         Task<T> SaveAsync(T rate);
+        Task DeleteAllAsync();
     }
 
     public interface IQueryRA<T>
@@ -34,6 +35,11 @@ namespace RateWebhook.ResourceAccessors
         public async Task<ThirdPartyRate[]> GetAllAsync()
         {
             return await thirdPartyRepository.GetAllAsync();
+        }
+
+        public async Task DeleteAllAsync()
+        {
+            await thirdPartyRepository.DeleteAllAsync();
         }
     }
 }

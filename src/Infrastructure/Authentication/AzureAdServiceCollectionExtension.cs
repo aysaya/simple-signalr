@@ -15,7 +15,7 @@ namespace Infrastructure.Authentication
         {
             builder.Services.Configure(configureOptions);
             builder.Services.AddSingleton<IConfigureOptions<JwtBearerOptions>, ConfigureAzureOptions>();
-            builder.AddJwtBearer();
+            builder.AddJwtBearer(o => o.RequireHttpsMetadata = false);
             return builder;
         }
 

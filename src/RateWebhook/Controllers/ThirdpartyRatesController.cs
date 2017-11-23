@@ -22,6 +22,7 @@ namespace RateWebhook.Controllers
             this.query = query;
         }
 
+        [Authorize(Policy = "User")]
         [HttpPost]
         public async Task Post([FromBody]Contracts.ThirdPartyRate value)
         {
@@ -45,11 +46,18 @@ namespace RateWebhook.Controllers
             });            
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ThirdPartyRate[]> Get()
         {
             return await query.GetAllAsync();
+        }
+
+        [Authorize(Policy = "Admin")]
+        [HttpDelete]
+        public async Task Clear()
+        {
+            await command.DeleteAllAsync();
         }
     }
 }

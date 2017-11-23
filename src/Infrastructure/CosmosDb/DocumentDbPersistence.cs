@@ -40,5 +40,10 @@ namespace Infrastructure.CosmosDb
 
             return results.ToArray();
         }
+
+        public Task DeleteAllAsync()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

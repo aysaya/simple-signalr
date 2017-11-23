@@ -7,5 +7,7 @@ namespace Infrastructure.Common
         Task<T> SaveAsync(T t);
 
         Task<T[]> GetAllAsync();
+
+        Task DeleteAllAsync();
     }
 }
